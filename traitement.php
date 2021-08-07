@@ -52,8 +52,48 @@
         header("location:index.php");
     }
     if(isset($_POST["voir"])){
-        session_start();
-        $_SESSION["menu"]=$_POST["voir"];
+        setcookie("menu", $_POST["voir"], time()+60*60*24*30);
+        header("location:Menu.php");
+    }
+    if(isset($_POST["add"])){
+        session_start();     
+        $sql = "INSERT INTO `command`(`plat`,`client`) VALUES ('".$_POST['add']."','".$_SESSION['id']."')";        
+        $result = mysqli_query($link, $sql);
+        setcookie("cmd", 1, time() + 5);
+        header("location:Menu.php");
+    }
+    if(isset($_POST["delete"])){
+        session_start();     
+        $sql =  "DELETE FROM `command` WHERE `client`=".$_SESSION["id"]." AND `plat`='".$_POST['delete']."' order by id desc limit 1";       
+        $result = mysqli_query($link, $sql);
+        setcookie("done", 1, time() + 5);
+        header("location:Menu.php");
+    }
+    if(isset($_POST["valider"])){
+        session_start();   
+        $sql = "SELECT * FROM user WHERE id='".$_SESSION["id"]."'";
+        $result = mysqli_query($link, $sql);
+        $user = mysqli_fetch_assoc($result);  
+        $sql =  "UPDATE `command` SET `date`='".date("Y-m-d h:i:sa")."',`etat`='Valide' WHERE etat='En cours' AND client='".$_SESSION["id"]."'";       
+        $result = mysqli_query($link, $sql);        
+        setcookie("done", 1, time() + 5);
+        $url = 'https://api.callmebot.com/whatsapp.php';
+        $text = "";
+        $name=$_SESSION['name'];
+        $plat=$_SESSION['plat'];
+        $prixplat=$_SESSION['prix-plat'];
+        $count=$_SESSION['count'];
+        for ($i=0; $i<count($name);$i++){      
+          $text=$text."    
+          Detail du Commande --> Restaurant : ".$name[$i]." / Commande : ".$plat[$i]." / Unite : ".$count[$i]." / Prix : ".$prixplat[$i]." MAD";          
+        }
+        $text = urlencode($text."// Info du Client --> Tel : ".$user["tel"]." / Addresse : ".$user["adresse_url"]."");
+        $phone=urlencode('212695046096');
+        $apikey=urlencode('748869');
+        $url = 'https://api.callmebot.com/whatsapp.php?phone=+'.$phone.'&text='.$text.'&apikey='.$apikey.'';
+        $result = file_get_contents($url);
+        if ($result === FALSE) { /* Handle error */ }
+        var_dump($result);  
         header("location:Menu.php");
     }
 ?>

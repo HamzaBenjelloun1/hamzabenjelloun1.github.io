@@ -5,6 +5,10 @@
     $sql = "SELECT * FROM user WHERE id='".$_SESSION["id"]."'";
     $result = mysqli_query($link, $sql);
     $user = mysqli_fetch_assoc($result);
+    $sql = "SELECT DISTINCT(command.plat),`prix-plat`,`image-plat`,restaurant.name FROM command,restaurant,user WHERE `client`=".$_SESSION["id"]." AND etat='En cours' AND restaurant.plat=command.plat;";
+    $rescommande = mysqli_query($link, $sql); 
+    $sql = "SELECT DISTINCT(command.plat),`prix-plat`,`image-plat`,restaurant.name,`date` FROM command,restaurant,user WHERE `client`=".$_SESSION["id"]." AND etat='Valide' AND restaurant.plat=command.plat  GROUP BY date;";
+    $vcommande = mysqli_query($link, $sql);    
   }
   else{
     session_destroy();
@@ -19,7 +23,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.87.0">
-    <title>Page d'accueil</title>
+    <title>Menu</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/headers/">
 
@@ -27,6 +31,9 @@
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="js/sidebars.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
 
     <style>           
       .learn{
@@ -47,9 +54,15 @@
           border-radius: 20px;
       }
       .icon{
-        color:rgb(5, 218, 5);
+        color:rgb(238,238,246,0.9);
       }
       .icon:hover{
+          color: rgb(238,238,246,1);
+      }
+      .icon1{
+        color:rgb(5, 218, 5);
+      }
+      .icon1:hover{
           color: green;
       }
       @media (min-width: 768px) {
@@ -80,7 +93,7 @@
 
     
     <!-- Custom styles for this template -->
-    <link href="sidebars.css" rel="stylesheet">
+    <link href="css/sidebars.css" rel="stylesheet">
     <link href="css/headers.css" rel="stylesheet">
   </head>
   <body>
@@ -152,11 +165,11 @@
         <ul class="list-unstyled ps-0">
           <li class="mb-1">
             <?php                           
-              $sql = "SELECT DISTINCT(`menu`) FROM restaurant WHERE name='".$_SESSION["menu"]."'";
+              $sql = "SELECT DISTINCT(`menu`) FROM restaurant WHERE name='".$_COOKIE["menu"]."'";
               $result = mysqli_query($link, $sql);
               while($menu = mysqli_fetch_assoc($result)){
               echo '
-              <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
+              <button style="color:white" class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
                 '.$menu["menu"].'
               </button>';
               // <div class="collapse show" id="home-collapse">
@@ -180,10 +193,10 @@
       <div class="col">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
             <?php
-              $sql = "SELECT DISTINCT(`plat`),`image-plat`,`prix-plat`,`menu` FROM restaurant WHERE name='".$_SESSION["menu"]."' AND `plat` != '' ";
+              $sql = "SELECT DISTINCT(`plat`),`image-plat`,`prix-plat`,`menu`,`sous-menu` FROM restaurant WHERE name='".$_COOKIE["menu"]."' AND `plat` != '' ";
               $result = mysqli_query($link, $sql);
               while($menu = mysqli_fetch_assoc($result)){
-                echo '<div class="col '.$menu["menu"].'">
+                echo '<div class="col '.$menu["menu"].' '.$menu['sous-menu'].'">
                   <div class="card shadow-sm">  
                       <div style="text-align: center;">
                         <img src="images/'.$menu["image-plat"].'.png" style="border-top-left-radius: 20px;border-top-right-radius: 20px;" width="80%" alt="">
@@ -193,16 +206,16 @@
                         <h6 class="card-text text">'.$menu["plat"].'</h6> 
                         ';                        
                         if(isset($_SESSION["id"])){
-                            echo '<i class="fa fa-plus-circle icon" data-bs-toggle="modal" data-bs-target="#add" aria-hidden="true" style=" font-size: larger;"></i>';
+                            echo '<form action="traitement.php" method="POST" ><button id="'.$menu['plat'].'" style="background-color:Transparent;border: none;" type="submit" name="add" value="'.$menu["plat"].'" ><i class="fa fa-plus-circle icon1" data-bs-toggle="modal" data-bs-target="#add" aria-hidden="true" style=" font-size: larger;"></i></button></form>';
                           }
                           else{
-                            echo '<i class="fa fa-plus-circle icon" data-bs-toggle="modal" data-bs-target="#signup" aria-hidden="true" style=" font-size: larger;"></i>';
+                            echo '<i class="fa fa-plus-circle icon1" data-bs-toggle="modal" data-bs-target="#signup" aria-hidden="true" style=" font-size: larger;"></i>';
                           }
                     echo '
                       </div>
                       <div class="d-flex justify-content-between align-items-center">                                
                         <small class="text-muted">
-                            '.$menu['prix-plat'].'                         
+                            '.$menu['prix-plat'].' MAD                       
                         </small>                   
                       </div>
                     </div>
@@ -309,7 +322,6 @@
         </div>
         </div>
         <!-- Config -->
-      <!-- Modal sign up -->
     <div class="modal fade" id="config" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" style="width:400px;">
       <div class="modal-content">
@@ -373,27 +385,39 @@
             </div>
             <div class="modal-body">
             <div class="list-group list-group-flush border-bottom scrollarea">
-              <a href="#" class="list-group-item list-group-item-action active py-1 lh-tight" aria-current="true">
-                <div class="row">                
-                <div class="d-flex col-8">
-                  <img src="images/KFC1.png" alt="" width=70%>
-                </div>
-                <div class="col-4 my-4">
-                  <h7 align="right">               
-                    <div class="col-12 mb-1 small">
-                      <strong class="mb-1">KFC - MIGHTY ZINGER</strong>
-                      <small>100 MAD</small>
-                    </div>
-                    <div class="col-12 mb-1 small">
-                      <b>Etat : Terminee</b>
-                    </div>
-                    <div class="col-12 mb-1 small">
-                      06-08-2021
-                    </div>                   
-                  </h7>
-                </div>      
-                </div>
-              </a>              
+              <?php
+              while($vcmd = mysqli_fetch_assoc($vcommande)){
+                $sq = "SELECT COUNT(command.plat) as cnt FROM command WHERE command.plat='".$vcmd["plat"]."' AND client=".$_SESSION['id']." AND etat='Valide'";
+                $counts = mysqli_query($link,$sq);
+                while($count = mysqli_fetch_assoc($counts)){
+                echo '
+                <a href="#" class="list-group-item list-group-item-action py-1 lh-tight" style="background-color:#b4c8e5; color:white;" aria-current="true">
+                  <h1 align="center">'.$vcmd['name'].'</h1>
+                  <div class="row">                
+                  <div class="d-flex col-6">
+                    <img src="images/'.$vcmd["image-plat"].'.png" alt="" width=100%>
+                  </div>
+                  <div class="col-4 my-5">
+                    <h7 align="right">               
+                      <div class="col-12 mb-1 small">
+                        <strong class="mb-1 pd-1">'.$vcmd["plat"].'</strong>                      
+                      </div>                    
+                      <div class="col-12 mb-1 small">
+                        <small>'.$vcmd["prix-plat"].' MAD</small>
+                      </div>
+                      <div class="col-12 mb-1 small">
+                        <small>x'.$count["cnt"].'</small>
+                      </div>
+                      <div class="col-12 mb-1 small">
+                        '.$vcmd["date"].'
+                      </div>                                       
+                    </h7>
+                  </div>                      
+                  </div>
+                </a> ';
+                }
+              }
+              ?>             
             </div>
             </div>
             <div class="modal-footer">
@@ -412,87 +436,80 @@
             </div>
             <div class="modal-body">
             <div class="list-group list-group-flush border-bottom scrollarea">
-              <a href="#" class="list-group-item list-group-item-action active py-1 lh-tight" aria-current="true">
-                <div class="row">                
-                <div class="d-flex col-8">
-                  <img src="images/KFC1.png" alt="" width=70%>
-                </div>
-                <div class="col-4 my-4">
-                  <h7 align="right">               
-                    <div class="col-12 mb-1 small">
-                      <strong class="mb-1">KFC - MIGHTY ZINGER</strong>
-                      <small>100 MAD</small>
+              <?php
+              
+              $name= array();
+              $plat = array();
+              $cnt = array();
+              $prixplat= array();              
+              while($commande = mysqli_fetch_assoc($rescommande)){              
+                $sq = "SELECT COUNT(command.plat) as cnt FROM command WHERE command.plat='".$commande["plat"]."' AND client=".$_SESSION['id']." AND etat='En cours'";
+                $counts = mysqli_query($link,$sq);
+                $count = mysqli_fetch_assoc($counts);
+                array_push($name,$commande["name"]);
+                array_push($plat,$commande["plat"]);
+                array_push($cnt,$count["cnt"]);
+                array_push($prixplat,$commande["prix-plat"]);
+                echo '
+                    <a href="#" class="list-group-item list-group-item-action py-1 lh-tight" style="background-color:#b4c8e5; color:white;" aria-current="true">
+                    <h1 align="center">'.$commande["name"].'</h1>
+                    <div class="row">                
+                    <div class="d-flex col-6">
+                      <img src="images/'.$commande["image-plat"].'.png" alt="" width=100%>
+                    </div>                
+                    <div class="col-4 my-5">
+                      <h7 align="right">               
+                        <div class="col-12 mb-1 small">
+                          <strong class="mb-1">'.$commande["plat"].'</strong>
+                          <small>'.$commande["prix-plat"].' MAD</small>
+                        </div>                         
+                        <div class="col-12 mb-1 small">
+                          <form action="traitement.php" method="POST" ><button style="background-color:Transparent;border: none;" type="submit" name="add" value="'.$commande["plat"].'" ><i class="fa fa-plus-circle icon" data-bs-toggle="modal" data-bs-target="#add" aria-hidden="true" style=" font-size: larger;"></i></button></form>
+                          &nbsp;
+                          '.$count["cnt"].'
+                          &nbsp;
+                          <form action="traitement.php" method="POST" ><button style="background-color:Transparent;border: none;" type="submit" name="delete" value="'.$commande["plat"].'" ><i class="fa fa-minus-circle icon" data-bs-toggle="modal" data-bs-target="#minus" aria-hidden="true" style=" font-size: larger;"></i></button></form>
+                        </div>                  
+                      </h7>
+                    </div>      
                     </div>
-                    <div class="col-12 mb-1 small">
-                      <b>Etat : En cours</b>
-                    </div>
-                    <div class="col-12 mb-1 small">
-                      06-08-2021
-                    </div>  
-                    <div class="col-12 mb-1 small">
-                      <i class="fa fa-trash" aria-hidden="true" style="color:#dc3545"></i>  
-                      &nbsp;
-                      <i class="fa fa-plus-circle icon" aria-hidden="true" style=" font-size: larger;"></i> x2   
-                    </div>                  
-                  </h7>
-                </div>      
-                </div>
-              </a>              
+                    <h5 align="center">En cours</h5>
+                  </a> 
+                ';                
+              }                
+              $_SESSION['name']=$name;
+              $_SESSION['plat']=$plat;
+              $_SESSION['prix-plat']=$prixplat;
+              $_SESSION['count']=$cnt;
+              ?>                           
             </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" name="valider" class="btn btn-danger" data-bs-dismiss="modal">Valider la commande</button>
+            <form action="traitement.php" method="POST">
+            <div class="modal-footer">     
+                       
+              <button type="submit" name="valider" value="<?php echo $_SESSION["id"]; ?>" class="btn btn-danger">Valider la commande</button>
             </div>
+            </form>
           </div>
         </div>
-      </div>
-      <!-- Add -->
-      <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalCenteredScrollableTitle" aria-modal="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Mes Commandes</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            <div class="list-group list-group-flush border-bottom scrollarea">
-              <a href="#" class="list-group-item list-group-item-action active py-1 lh-tight" aria-current="true">
-                <div class="row">                
-                <div class="d-flex col-8">
-                  <img src="images/KFC1.png" alt="" width=70%>
-                </div>
-                <div class="col-4 my-4">
-                  <h7 align="right">               
-                    <div class="col-12 mb-1 small">
-                      <strong class="mb-1">KFC - MIGHTY ZINGER</strong>
-                      <small>100 MAD</small>
-                    </div>
-                    <div class="col-12 mb-1 small">
-                      <b>Etat : En cours</b>
-                    </div>
-                    <div class="col-12 mb-1 small">
-                      06-08-2021
-                    </div>  
-                    <div class="col-12 mb-1 small">
-                      <i class="fa fa-trash" aria-hidden="true" style="color:#dc3545"></i>  
-                      &nbsp;
-                      <i class="fa fa-plus-circle icon" aria-hidden="true" style=" font-size: larger;"></i> x2   
-                    </div>                  
-                  </h7>
-                </div>      
-                </div>
-              </a>              
-            </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" name="valider" class="btn btn-danger" data-bs-dismiss="modal">Valider la commande</button>
+      </div>  
+      <!-- Done     -->
+      <div class="modal fade" id="done"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"  role="document">
+          <div class="modal-content w-100 align-items-center justify-content-center" style="background-color:transparent; border:none">
+          <div class="card text-white bg-danger mb-3 align-items-center justify-content-center" style="max-width: 18rem;">
+            <div class="card-body ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16" style="float:left;padding:10px;">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                </svg>
+                <h5>L'opération a été effectuée</h5>
             </div>
           </div>
+          </div>
         </div>
-      </div>
-    <script src="js/sidebars.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>    
+      </div>      
+      
     <?php
       if(isset($_COOKIE["notmatch"]) | isset($_COOKIE["notunique"])){
         echo "<script type='text/javascript'>
@@ -501,6 +518,20 @@
         });
         </script>";
       }
+      if(isset($_COOKIE["cmd"])){
+        echo "<script type='text/javascript'>
+        $(document).ready(function(){
+        $('#shop').modal('show');
+        });
+        </script>";
+      }
+      if(isset($_COOKIE["done"])){
+        echo "<script type='text/javascript'>
+        $(document).ready(function(){
+        $('#done').modal('show');
+        });
+        </script>";
+      }      
       if(isset($_POST["edit"])){
         if($_POST["pass"]==$_POST["conf_pass"]){
           echo $user["id"];

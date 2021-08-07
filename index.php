@@ -1,7 +1,7 @@
 <?php
   session_start();
-  if(isset($_SESSION["id"])){
-    include("connexion.php");
+  include("connexion.php");
+  if(isset($_SESSION["id"])){    
     $sql = "SELECT * FROM user WHERE id='".$_SESSION["id"]."'";
     $result = mysqli_query($link, $sql);
     $user = mysqli_fetch_assoc($result);
@@ -32,10 +32,10 @@
         font-size:170%;
       }
       .icon{
-        color:rgb(5, 218, 5);
+        color:rgb(238,238,246,0.9);
       }
       .icon:hover{
-          color: green;
+          color: rgb(238,238,246,1);
       }
       .text {
         vertical-align: middle;
@@ -389,25 +389,28 @@
             </div>
             <div class="modal-body">
             <div class="list-group list-group-flush border-bottom scrollarea">
-              <a href="#" class="list-group-item list-group-item-action active py-1 lh-tight" aria-current="true">
+              <a href="#" class="list-group-item list-group-item-action py-1 lh-tight" style="background-color:#b4c8e5; color:white;" aria-current="true">
+                <h1 align="center">KFC</h1>
                 <div class="row">                
-                <div class="d-flex col-8">
-                  <img src="images/KFC1.png" alt="" width=70%>
+                <div class="d-flex col-6">
+                  <img src="images/KFC1.png" alt="" width=100%>
                 </div>
-                <div class="col-4 my-4">
+                <div class="col-4 my-5">
                   <h7 align="right">               
                     <div class="col-12 mb-1 small">
-                      <strong class="mb-1">KFC - MIGHTY ZINGER</strong>
-                      <small>100 DH x2</small>
+                      <strong class="mb-1 pd-1">MIGHTY ZINGER BOX</strong>                      
+                    </div>                    
+                    <div class="col-12 mb-1 small">
+                      <small>100 MAD</small>
                     </div>
                     <div class="col-12 mb-1 small">
-                      <b>Etat : Terminee</b>
+                      <small>x2</small>
                     </div>
                     <div class="col-12 mb-1 small">
                       06-08-2021
-                    </div>                   
+                    </div>                                       
                   </h7>
-                </div>      
+                </div>                      
                 </div>
               </a>              
             </div>
@@ -428,31 +431,32 @@
             </div>
             <div class="modal-body">
             <div class="list-group list-group-flush border-bottom scrollarea">
-              <a href="#" class="list-group-item list-group-item-action active py-1 lh-tight" aria-current="true">
+              <a href="#" class="list-group-item list-group-item-action py-1 lh-tight" style="background-color:#b4c8e5; color:white;" aria-current="true">
+                <h1 align="center">KFC</h1>
                 <div class="row">                
-                <div class="d-flex col-8">
-                  <img src="images/KFC1.png" alt="" width=70%>
+                <div class="d-flex col-6">
+                  <img src="images/KFC1.png" alt="" width=100%>
                 </div>
-                <div class="col-4 my-4">
+                <div class="col-4 my-5">
                   <h7 align="right">               
                     <div class="col-12 mb-1 small">
-                      <strong class="mb-1">KFC - MIGHTY ZINGER</strong>
+                      <strong class="mb-1">MIGHTY ZINGER</strong>
                       <small>100 MAD</small>
-                    </div>
-                    <div class="col-12 mb-1 small">
-                      <b>Etat : En cours</b>
-                    </div>
+                    </div>                                        
                     <div class="col-12 mb-1 small">
                       06-08-2021
                     </div>  
                     <div class="col-12 mb-1 small">
-                      <i class="fa fa-trash" aria-hidden="true" style="color:#dc3545"></i>  
+                      <i class="fa fa-minus-circle icon" aria-hidden="true" ></i>
                       &nbsp;
-                      <i class="fa fa-plus-circle icon" aria-hidden="true" style=" font-size: larger;"></i> x2   
+                      2
+                      &nbsp;
+                      <i class="fa fa-plus-circle icon" aria-hidden="true" ></i>
                     </div>                  
                   </h7>
                 </div>      
                 </div>
+                <h5 align="center">En cours</h5>
               </a>              
             </div>
             </div>
